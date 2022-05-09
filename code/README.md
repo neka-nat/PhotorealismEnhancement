@@ -12,6 +12,7 @@ You'll need pytorch, scikit-image, imageio, tqdm:
     conda install imageio
 
     pip install tqdm
+    pip install kornia
     
 Training requires [MSeg](https://github.com/mseg-dataset/mseg-semantic) for generating robust labels of a dataset, [faiss](https://github.com/facebookresearch/faiss) for matching crops across datasets, and [LPIPS](https://github.com/richzhang/PerceptualSimilarity) for the perceptual loss. The code contains optional downsampling using [Kornia](https://github.com/kornia/kornia) for the perceptual loss and the discriminator. If you do not wish to use it (it is disabled by default), you may remove this dependency. Please refer to the respective websites for up-to-date installation instructions.
 
