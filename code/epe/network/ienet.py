@@ -142,7 +142,6 @@ class HighResolutionModule(nn.Module):
 		self.relu        = nn.ReLU(inplace=False)
 
 		assert len(self.branches) == num_branches, f'HRModule has {len(self.branches)} branches, but is supposed to have {num_branches}.'
-		pass
 
 
 	def _check_branches(self, num_branches, blocks, num_blocks, num_inchannels, num_channels):
@@ -288,7 +287,6 @@ class GBufferEncoderType(Enum):
 	SPADE   = 2
 	ENCODER = 3
 	COMPLEX = 4
-	pass
 
 
 class HighResolutionNet(nn.Module):
@@ -341,13 +339,10 @@ class HighResolutionNet(nn.Module):
 			self.gbuffer_encoder = ge.GBufferEncoder(0, \
 				self._gbuffer_encoder_norm, self._num_classes, 
 				self._num_gbuf_channels, ie_config['cls2gbuf'], self._num_stages)
-			pass
 		elif self._encoder_type is GBufferEncoderType.COMPLEX:
 			self.gbuffer_encoder = make_genet(ie_config)
-			pass
 		else:
 			self.gbuffer_encoder = None
-			pass	
 		
 		self.stage1_cfg    = extra['STAGE1']
 		self._log.debug(f'  Stage 1')
@@ -371,7 +366,6 @@ class HighResolutionNet(nn.Module):
 			stage, pre_stage_channels = self._make_stage(block, block_exp, stage_cfg, num_channels)
 			stages.append(stage)
 			stage_cfgs.append(stage_cfg)
-			pass
 
 		self.transitions = nn.ModuleList(transitions)
 		self.stages      = nn.ModuleList(stages)
@@ -384,12 +378,10 @@ class HighResolutionNet(nn.Module):
 			m = [nn.ReplicationPad2d(1), nn.Conv2d(ci+co, co, 3), self.Norm2d(co), nn.LeakyReLU(0.2, True)]
 			if i == self._num_stages-2:
 				m += [nn.ReplicationPad2d(1), nn.Conv2d(co, 3, 3)]
-				pass
+
 			last_layers.append(nn.Sequential(*m))
-			pass
 
 		self.up_layers = nn.ModuleList(last_layers)
-		pass
 
 
 	def _make_transition_layer(self, num_channels_pre_layer, num_channels_cur_layer):
@@ -488,7 +480,6 @@ class HighResolutionNet(nn.Module):
 
 		if self._log.isEnabledFor(logging.DEBUG):
 			self._log.debug(f'IENet:forward(i:{x.shape}, g:{g.shape}, s:{s.shape})')
-			pass
 
 		if self._encoder_type is GBufferEncoderType.CONCAT:
 			x = torch.cat((x, g), 1)
@@ -509,8 +500,6 @@ class HighResolutionNet(nn.Module):
 			self._log.debug(f'  Encoded G-buffers for {len(g_list)} branches:')
 			for i,gi in enumerate(g_list):
 				self._log.debug(f'  {i}: {gi.shape}')
-				pass				
-			pass
 
 		x   = self.stem(x)
 		x,_ = self.layer1([x, g_list[0]])
@@ -534,13 +523,9 @@ class HighResolutionNet(nn.Module):
 					x_list.append(y_list[i])
 				else:
 					x_list.append(self.transitions[j+1][i](y_list[i if i < self.stage_cfgs[j]['NUM_BRANCHES'] else -1]))				
-					pass
-				pass
-			pass
 
 		if self._encoder_type is GBufferEncoderType.SPADE:
 			g_list = ge._append_downsampled_gbuffers(g_list, x_list)
-			pass
 
 		x_list = [x_list, g_list]
 		x, _ = self.stages[-1](x_list)
@@ -553,7 +538,7 @@ class HighResolutionNet(nn.Module):
 		for i,xi in enumerate(x[1:]):
 			y = F.interpolate(y, size=(xi.shape[-2], xi.shape[-1]), mode='bilinear', align_corners=False)
 			y = self.up_layers[i](torch.cat((y, xi), 1))
-			pass			
+			
 		return y
 
 
@@ -579,7 +564,7 @@ def make_hrnet_config(num_stages):
 		cfg['BLOCK']        = 'BASIC'
 		cfg['FUSE_METHOD']  = 'SUM'
 		hrnet_cfg[f'STAGE{i}'] = cfg
-		pass
+
 	return hrnet_cfg
 
 

@@ -346,7 +346,7 @@ class BaseExperiment:
 		self.save_epochs     = int(train_cfg.get('save_epochs', -1))
 		self.save_iterations = int(train_cfg.get('save_iterations', 100000))
 		self.weight_save     = str(train_cfg.get('name_save', 'model'))
-		self.no_validation   = bool(train_cfg.get('no_validation', False))
+		self.no_validation   = bool(train_cfg.get('no_validation', True))
 		self.val_interval    = int(train_cfg.get('val_interval', 20000))
 
 

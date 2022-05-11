@@ -289,7 +289,6 @@ class GBufferEncoderType(Enum):
 	CONCAT  = 1
 	SPADE   = 2
 	ENCODER = 3
-	pass
 
 
 class HighResolutionNet(nn.Module):

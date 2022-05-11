@@ -129,7 +129,7 @@ class ProjectionDiscriminator(nn.Module):
 		else:
 			self.out = nn.Sequential(nn.Conv2d(dim_out,dim_out,3,padding=1), nn.LeakyReLU(0.2, True), nn.Conv2d(dim_out, 1, 1))
 		self.num_layers = num_layers+1
-		self.embedding = nn.Embedding(194,dim_out)
+		self.embedding = nn.Embedding(194*2,dim_out)
 		self.num_layers = num_layers+1
 
 		for m in self.modules():
@@ -143,10 +143,6 @@ class ProjectionDiscriminator(nn.Module):
 					nn.init.constant_(m.bias, 0)
 				except AttributeError:
 					pass
-				pass
-			pass				
-		pass
-
 
 	def forward(self, t):
 		x,y = t
@@ -168,7 +164,6 @@ class ProjectionDiscriminator(nn.Module):
 				y = torch.argmax(torch.nn.functional.softmax(y, dim=1), axis=1, keepdims=True)
 				y = self.embedding(y.reshape(-1))
 				y = y.permute(1,0).reshape(1,c,h,w)
-				pass
 
 			if self.out is not None:
 				y = (y * x).sum(dim=1,keepdims=True)

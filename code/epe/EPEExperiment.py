@@ -47,6 +47,7 @@ vgg_losses = {\
 
 fake_datasets = {\
 	'GTA':ds.PfDDataset,
+	'pipefake':ds.PipefakeDataset,
 }
 
 
@@ -160,9 +161,8 @@ class EPEExperiment(ee.GANExperiment):
 		# training
 
 		if self.action == 'train':
-
-			source_dataset = fake_datasets[self.fake_name](ds.utils.read_filelist(self.fake_train_path, 4, True))
-			target_dataset = ds.RobustlyLabeledDataset(self.real_name, ds.utils.read_filelist(self.real_basepath, 2, True))
+			source_dataset = fake_datasets[self.fake_name](ds.utils.read_filelist(self.fake_train_path, 4, False))
+			target_dataset = ds.RobustlyLabeledDataset(self.real_name, ds.utils.read_filelist(self.real_basepath, 2, False))
 
 			if self.sampling == 'matching':
 				self.dataset_train = MatchedCrops(source_dataset, target_dataset, self.sample_cfg)
@@ -203,10 +203,8 @@ class EPEExperiment(ee.GANExperiment):
 
 		if generator_type == 'hr':
 			generator = nw.ResidualGenerator(nw.make_ienet(self.gen_cfg))
-			pass
 		elif generator_type == 'hr_new':
 			generator = PassthruGenerator(nw.make_ienet2(self.gen_cfg))
-			pass
 
 		discriminator = {\
 			'patchgan':nw.PatchGANDiscriminator,
@@ -270,7 +268,6 @@ class EPEExperiment(ee.GANExperiment):
 
 		with torch.no_grad():
 			rep_fake = self.network.generator(batch_fake)
-			pass
 
 		log_img['fake']     = batch_fake.img.detach()
 		log_img['rec_fake'] = rep_fake.detach()

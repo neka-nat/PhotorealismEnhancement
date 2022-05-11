@@ -39,7 +39,6 @@ def _append_downsampled_gbuffers(g_list, x_list):
 
 	for i in range(len(g_list), len(x_list)):
 		g_list.append(torch.nn.functional.interpolate(g_list[i-1], size=[x_list[i].shape[-2],x_list[i].shape[-1]], mode='bilinear', align_corners=False))
-		pass
 	return g_list
 
 
@@ -49,12 +48,9 @@ def _append_downsampled_shaders(s, s_list, x_list):
 	if s.shape[1] != 1:
 		for i in range(len(s_list), len(x_list)):
 			s_list.append(torch.argmax(torch.nn.functional.interpolate(s, size=[x_list[i].shape[-2],x_list[i].shape[-1]], mode='bilinear', align_corners=False), dim=1, keepdims=True).long())
-			pass
 	else:
 		for i in range(len(s_list), len(x_list)):
 			s_list.append(torch.nn.functional.interpolate(s, size=[x_list[i].shape[-2],x_list[i].shape[-1]], mode='nearest').long())
-			pass
-		pass
 
 	return s_list
 
@@ -79,7 +75,6 @@ class GBufferEncoder(nn.Module):
 		self.num_down_levels      = num_down_levels
 
 		self.class_encoders, self.joint_encoder_layers = self._make_gbuffer_encoders()
-		pass
 
 
 	def _compute_gbuf_encoder_dim(self):
@@ -98,7 +93,6 @@ class GBufferEncoder(nn.Module):
 		for i in range(self.num_classes):
 			dim_in = self.num_gbuffer_channels if not i in cls2dim else cls2dim[i]
 			class_encoders.append(_gbuffer_class_encoder_factory[self.norm_type](dim_in, 128, s0, s1))
-			pass
 
 		self._log.debug(f'  Creating joint encoder for {self.num_branches} branches:')
 		joint_enoders = []
@@ -106,7 +100,6 @@ class GBufferEncoder(nn.Module):
 			je = _gbuffer_joint_encoder_factory[self.norm_type](128, 128, 1 if i==0 else 2)
 			self._log.debug(f'  {i}: {je}')
 			joint_enoders.append(je)
-			pass
 
 		return nn.ModuleList(class_encoders), nn.ModuleList(joint_enoders)
 
@@ -129,19 +122,16 @@ class GBufferEncoder(nn.Module):
 
 		if self._log.isEnabledFor(logging.DEBUG):
 			self._log.debug(f'G-BufferEncoder:forward(g:{gbuffers.shape}, c:{classmap.shape})')
-			pass
 
 		num_classes = classmap.shape[1]
 		features = 0
 		for c in range(num_classes):
 			features += classmap[:,c,:,:] * self.class_encoders[c](\
 				self.cls2gbuf[c](gbuffers) if c in self.cls2gbuf else gbuffers)
-			pass
 
 		features = [features]
 		for layer in self.joint_encoder_layers:
 			features.append(layer(features[-1]))
-			pass
 
 		return features[1:]
 
@@ -208,17 +198,15 @@ class GBufferNorm(nn.Module):
 		for i in range(num_layers):
 			model += [gbuf_proc(dim_in,dim_e)]
 			dim_in = dim_e
-			pass
+
 		self._conv  = nn.Sequential(*model) if num_layers > 0 else None
 		self._scale = nn.Conv2d(dim_e,dim_x,1)
 		self._bias  = nn.Conv2d(dim_e,dim_x,1)
-		pass
 
 
 	def forward(self, x, g):
 		if self._conv is not None:
 			g = self._conv(g)
-			pass
 
 		return self._norm(x) * self._scale(g) + self._bias(g)
 
@@ -243,16 +231,14 @@ class GBufferConv(nn.Module):
 		for i in range(num_layers):
 			model += [gbuf_proc(dim_in,dim_e)]
 			dim_in = dim_e
-			pass
+
 		self._conv  = nn.Sequential(*model) if num_layers > 0 else None
 		self._scale = nn.Conv2d(dim_e,dim_x,1)
 		self._bias  = nn.Conv2d(dim_e,dim_x,1)
-		pass
 
 
 	def forward(self, x, g):
 		if self._conv is not None:
 			g = self._conv(g)
-			pass
 
 		return x  * (1- 0.1 * self._scale(g)) + 0.1 * self._bias(g)

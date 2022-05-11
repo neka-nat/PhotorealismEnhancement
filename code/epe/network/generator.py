@@ -10,7 +10,6 @@ class ResidualGenerator(nn.Module):
 	def __init__(self, network):
 		super(ResidualGenerator, self).__init__()
 		self.network = network
-		pass
 
 	def forward(self, epe_batch):
 		return make_residual(epe_batch.img, self.network(epe_batch))
